@@ -12,27 +12,33 @@ namespace nb2255
     {
         public bool grabbed = false;  // have i been picked up, or not?
         public float grabStrength = 10f;
-        Rigidbody myRb;
         StrobeSelected strobe;
         float dist;
+        Rigidbody rb;
+        float initialDrag;
+
 
         // Use this for initialization
         void Start()
         {
-            myRb = GetComponent<Rigidbody>();
+            rb = GetComponent<Rigidbody>();
             strobe = GetComponent<StrobeSelected>();
+            initialDrag = rb.drag;
         }
 
         // Update is called once per frame
         void Update()
         {
             if (grabbed) {
-                //float dist = Vector3.Distance(transform.position, Camera.main.transform.position);
-                //Debug.Log("Distance: " + dist);
+                // we can think of the grabbing as moving the cube along the surface of a sphere with radius dist
+                // define goTo to be the vector that we want the cube to "go to" (i.e. where the camera is pointing)
                 Vector3 goTo = Camera.main.transform.forward * dist + Camera.main.transform.position;
+                // define delta to be the vector from the cube's current position to goTo
                 Vector3 delta = (goTo - transform.position);
-                Debug.Log("Delta: " + delta);
-                GetComponent<Rigidbody>().AddForce( delta*grabStrength );
+                // add a force in the direction of delta, scaled by our grabstrength
+                rb.AddForce( delta*grabStrength );
+                // add drag to the cube, scaled by how close it is to goTo
+                rb.drag = grabStrength / delta.magnitude;
             }
         }
 
@@ -47,16 +53,17 @@ namespace nb2255
             {  // now drop it
                 grabbed = false;
                 strobe.trigger = false;
-                GetComponent<Rigidbody>().useGravity = true;
+                rb.useGravity = true;
+                rb.drag = initialDrag;
             }
             else
             {   // pick it up:
-                // make it move with gaze, keeping same distance from camera
+                // dist is the distance from the camera to the cube
                 dist = Vector3.Distance(transform.position, Camera.main.transform.position);
                 grabbed = true;
                 strobe.trigger = true;   // turn on color strobe so we know we have it
                 Debug.Log("turning off gravity");
-                GetComponent<Rigidbody>().useGravity = false;
+                rb.useGravity = false;
 
             }
         }
