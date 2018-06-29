@@ -8,7 +8,7 @@ namespace nb2255
      * PickupMe component allows user to select this object and 
      * move it with their gaze
      ******/
-    public class PickupMe : MonoBehaviour
+    public class PickupMe  : ITrigger
     {
         public bool grabbed = false;  // have i been picked up, or not?
         public float grabStrength = 10f;
@@ -16,7 +16,9 @@ namespace nb2255
         float dist;
         Rigidbody rb;
         float initialDrag;
-
+        callback closeMenu;
+        setter setToggle;
+        callback removeSelf;
 
         // Use this for initialization
         void Start()
@@ -42,15 +44,21 @@ namespace nb2255
             }
         }
 
+        public override string GetName()
+        {
+            return "Pick Up";
+        }
+
         /*
          * PickupOrDrop
          * Handle the event when the user clicks the button while 
          * gaze is on this object.  Toggle grabbed state.
          */
-        public void PickupOrDrop()
+        public override void Toggle()
         {
             if (grabbed)
             {  // now drop it
+                removeSelf();
                 grabbed = false;
                 strobe.trigger = false;
                 rb.useGravity = true;
@@ -59,6 +67,8 @@ namespace nb2255
             else
             {   // pick it up:
                 // dist is the distance from the camera to the cube
+                removeSelf = setToggle(Toggle);
+                closeMenu();
                 dist = Vector3.Distance(transform.position, Camera.main.transform.position);
                 grabbed = true;
                 strobe.trigger = true;   // turn on color strobe so we know we have it
@@ -66,6 +76,12 @@ namespace nb2255
                 rb.useGravity = false;
 
             }
+        }
+
+        public override void setCallBacks( callback cb, setter set )
+        {
+            closeMenu = cb;
+            setToggle = set;
         }
     }
 }
