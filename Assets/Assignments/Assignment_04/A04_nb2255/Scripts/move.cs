@@ -6,6 +6,7 @@ namespace nb2255
 {
     public class move : MonoBehaviour
     {
+        public float speed = 1;
 
         // Use this for initialization
         void Start()
@@ -20,7 +21,7 @@ namespace nb2255
             {
                 Debug.Log("mouse button down!");
                 Rigidbody rb = GetComponent<Rigidbody>();
-                Vector3 direction = Camera.main.transform.rotation * Vector3.forward;
+                Vector3 direction = Camera.main.transform.rotation * Vector3.forward * speed;
                 rb.AddForce(direction);
             }
         }
