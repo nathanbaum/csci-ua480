@@ -19,9 +19,12 @@ namespace nb2255
         {
             if ( Input.GetMouseButton(0) )
             {
-                Debug.Log("mouse button down!");
+                //when the mouse button is being pressed
+                //Debug.Log("mouse button down!");
                 Rigidbody rb = GetComponent<Rigidbody>();
+                //get direction of camera
                 Vector3 direction = Camera.main.transform.rotation * Vector3.forward * speed;
+                //add force in that direction
                 rb.AddForce(direction);
             }
         }
